@@ -118,7 +118,6 @@ class YOLOv5:
     def predict(self, input_img, img_num):
         input_data = {self.input_name: input_img}
         outputs = self.net.process(self.graph_name, input_data)
-        
         # resort
         out_keys = list(outputs.keys())
         ord = []
@@ -151,6 +150,7 @@ class YOLOv5:
         else:
             input_img = np.zeros(self.input_shape, dtype='float32')
             input_img[:img_num] = np.stack(preprocessed_img_list)
+        
             
         start_time = time.time()
         outputs = self.predict(input_img, img_num)
@@ -172,12 +172,12 @@ def draw_numpy(image, boxes, masks=None, classes_ids=None, conf_scores=None, lan
             color = COLORS[int(classes_ids[idx]) + 1]
         else:
             color = (0, 0, 255)
-        cv2.rectangle(image, (x1, y1), (x2, y2), color, thickness=2)
+        cv2.rectangle(image, (x1, y1), (x2, y2), color, thickness=1)
         if classes_ids is not None and conf_scores is not None:
             classes_ids = classes_ids.astype(np.int8)
             cv2.putText(image, "Face" + ':' + str(round(conf_scores[idx], 2)),
                         (x1, y1 - 5),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, thickness=2)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, thickness=1)
         if masks is not None:
             mask = masks[:, :, idx]
             image[mask] = image[mask] * 0.5 + np.array(color) * 0.5
@@ -245,9 +245,10 @@ def main(args):
                 filename_list.append(filename)
                 if (len(img_list) == batch_size or cn == len(filenames)) and len(img_list):
                     # predict
-                    det = yolov5(img_list)
+                    results = yolov5(img_list)
                     
                     for i, filename in enumerate(filename_list):
+                        det = results[i]
                         # save image
                         res_img = draw_numpy(img_list[i], det[:,:4], masks=None, classes_ids=det[:, 15], conf_scores=det[:, 4], landmarks=det[:, 5:15])
                         cv2.imwrite(os.path.join(output_img_dir, filename), res_img)

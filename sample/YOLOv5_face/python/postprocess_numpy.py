@@ -109,7 +109,8 @@ class PostProcess:
                 landmarks[:, [0, 2, 4, 6, 8]] = landmarks[:, [0, 2, 4, 6, 8]].clip(0, org_w -1)
                 landmarks[:, [1, 3, 5, 7, 9]] = landmarks[:, [1, 3, 5, 7, 9]].clip(0, org_h - 1)
                 det[:, 5:15] = landmarks.round()
-        return det
+
+        return outs
 
 
 # numpy multiclass nms implementation from original yolov5 repo torch implementation
